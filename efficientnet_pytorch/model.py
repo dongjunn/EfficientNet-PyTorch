@@ -178,7 +178,10 @@ class EfficientNet(nn.Module):
         x = self.extract_features(inputs)
 
         # Pooling and final linear layer
-        x = F.adaptive_avg_pool2d(x, 1).squeeze(-1).squeeze(-1)
+        ap = F.adaptive_avg_pool2d(x, 1).squeeze(-1).squeeze(-1)
+        mp = F.adaptive_max_pool2d(x, 1).squeeze(-1).squeeze(-1)
+        x = torch.cat([ap, mp], 1)
+        print(f'Pool layer shape{x.size()}')
         if self._dropout:
             x = F.dropout(x, p=self._dropout, training=self.training)
         x = self._fc(x)
